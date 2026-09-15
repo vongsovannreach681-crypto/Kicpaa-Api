@@ -14,6 +14,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('add-links/reorder', [AddLinkController::class, 'reorder']);
+Route::post('add-links/{addLink}/view', [AddLinkController::class, 'recordView']);
 Route::apiResource('add-links', AddLinkController::class);
 Route::apiResource('addThemes', AddThemeController::class);
 Route::get('design-settings', [DesignSettingController::class, 'show']);

@@ -74,6 +74,24 @@ class AddLinkTest extends TestCase
         $this->assertDatabaseMissing('add_links', ['id' => $link->id]);
     }
 
+    public function test_an_image_can_be_added_when_the_link_has_no_existing_image(): void
+    {
+        Storage::fake('public');
+        $link = addLink::create([
+            'title' => 'KICPAA',
+            'URL' => 'https://kicpaa.org.kh',
+            'image' => null,
+        ]);
+
+        $this->postJson('/api/add-links/'.$link->id.'?_method=PUT', [
+            'title' => $link->title,
+            'URL' => $link->URL,
+            'image' => $this->imageFile('new-logo.png'),
+        ])->assertOk()->assertJsonPath('image', fn (string $path): bool => str_starts_with($path, 'images/'));
+
+        Storage::disk('public')->assertExists($link->fresh()->image);
+    }
+
     public function test_link_order_can_be_saved(): void
     {
         $first = addLink::create([
@@ -98,6 +116,23 @@ class AddLinkTest extends TestCase
         $this->assertDatabaseHas('add_links', [
             'id' => $first->id,
             'position' => 1,
+        ]);
+    }
+
+    public function test_a_link_view_is_counted(): void
+    {
+        $link = addLink::create([
+            'title' => 'KICPAA',
+            'URL' => 'https://kicpaa.org.kh',
+        ]);
+
+        $this->postJson('/api/add-links/'.$link->id.'/view')
+            ->assertOk()
+            ->assertJsonPath('view_count', 1);
+
+        $this->assertDatabaseHas('add_links', [
+            'id' => $link->id,
+            'view_count' => 1,
         ]);
     }
 

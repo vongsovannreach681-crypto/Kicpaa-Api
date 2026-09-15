@@ -52,6 +52,13 @@ class AddLinkController extends Controller
         return response()->json(['message' => 'Links reordered.']);
     }
 
+    public function recordView(addLink $addLink): JsonResponse
+    {
+        $addLink->increment('view_count');
+
+        return response()->json($this->linkData($addLink->refresh()));
+    }
+
     public function show(addLink $addLink): JsonResponse
     {
         return response()->json($this->linkData($addLink));
@@ -62,11 +69,14 @@ class AddLinkController extends Controller
         $validated = $request->validate([
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'URL' => ['sometimes', 'required', 'url', 'max:255'],
-            'image' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($addLink->image);
+            if ($addLink->image) {
+                Storage::disk('public')->delete($addLink->image);
+            }
+
             $validated['image'] = $request->file('image')->store('images', 'public');
         }
 
@@ -90,10 +100,18 @@ class AddLinkController extends Controller
             'title' => $link->title,
             'URL' => $link->URL,
             'image' => $link->image,
-            'image_url' => $link->image ? Storage::disk('public')->url($link->image) : null,
+            'image_url' => $link->image ? $this->publicImageUrl($link->image) : null,
             'position' => $link->position,
+            'view_count' => $link->view_count,
             'created_at' => $link->created_at,
             'updated_at' => $link->updated_at,
         ];
+    }
+
+    private function publicImageUrl(string $path): string
+    {
+        $url = Storage::disk('public')->url($path);
+
+        return parse_url($url, PHP_URL_PATH) ?: $url;
     }
 }

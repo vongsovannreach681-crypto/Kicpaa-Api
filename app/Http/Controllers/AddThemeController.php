@@ -68,10 +68,17 @@ class AddThemeController extends Controller
             'themeName' => $theme->themeName,
             'themeImage' => $theme->themeImage,
             'themeImageUrl' => $theme->themeImage
-                ? Storage::disk('public')->url($theme->themeImage)
+                ? $this->publicImageUrl($theme->themeImage)
                 : null,
             'created_at' => $theme->created_at,
             'updated_at' => $theme->updated_at,
         ];
+    }
+
+    private function publicImageUrl(string $path): string
+    {
+        $url = Storage::disk('public')->url($path);
+
+        return parse_url($url, PHP_URL_PATH) ?: $url;
     }
 }
