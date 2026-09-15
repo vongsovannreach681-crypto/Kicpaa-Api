@@ -3,6 +3,9 @@
 use App\Http\Controllers\AddLinkController;
 use App\Http\Controllers\AddThemeController;
 use App\Http\Controllers\DesignSettingController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use App\Http\Controllers\MySettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +20,5 @@ Route::get('design-settings', [DesignSettingController::class, 'show']);
 Route::get('design-options', [DesignSettingController::class, 'options']);
 Route::patch('design-settings', [DesignSettingController::class, 'update']);
 
+
+Route::apiResource('my-settings', MySettingController::class);
