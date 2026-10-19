@@ -41,6 +41,10 @@ php artisan boost:install
 
 Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
+## Docker Deployment
+
+Build the production image from this directory with `docker build -t kicpaa-api .`. The Dockerfile installs Composer dependencies after copying `composer.json` and `composer.lock`, builds the Vite assets, and serves the app on port 8080.
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
